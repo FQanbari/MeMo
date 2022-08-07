@@ -1,4 +1,7 @@
+using Data.Repositories;
 using Memo.App.Data;
+using Memo.App.Data.IRepository;
+using Memo.App.Data.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddMvc();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUserRepository,UserRepository>();
 
 var app = builder.Build();
 
@@ -30,5 +36,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
-
+app.UseEndpoints(options =>
+{
+    options.MapControllers();
+});
 app.Run();
