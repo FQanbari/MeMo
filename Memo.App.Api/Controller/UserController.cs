@@ -1,4 +1,5 @@
-﻿using Memo.App.Data.IRepository;
+﻿using Common.Utilities;
+using Memo.App.Data.IRepository;
 using Memo.App.Entities.Account;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +51,7 @@ namespace Memo.App.Api.Controller
             var user = new User();
             user.Name = model.Name;
             user.UserName = model.UserName;
-            user.Password = model.Password;
+            user.Password = SecurityHelper.GetSha256Hash(user.Password);
             user.Family = model.Family;
             user.Age = model.Age;
 
@@ -58,13 +59,13 @@ namespace Memo.App.Api.Controller
         }
 
         // PUT api/<UserController>/5
-        [HttpPut]
-        public async Task<IActionResult> Put(int id, User user, CancellationToken cancellationToken)
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Put(int id, UserViewModel user, CancellationToken cancellationToken)
         {
             var updateUser = await userRepository.GetByIdAsync(cancellationToken, id);
             updateUser.Name = user.Name;
             updateUser.UserName = user.UserName;
-            updateUser.Password = user.Password;
+            updateUser.Password = SecurityHelper.GetSha256Hash(user.Password);
             updateUser.Family = user.Family;
             updateUser.Age = user.Age;
 
