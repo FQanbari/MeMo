@@ -8,6 +8,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Memo.App.Services\Memo.App.Services.csproj" />
+	  <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+	  <PackageReference Include="AutoMapper" Version="11.0.1" />
+	  <PackageReference Include="ElmahCore" Version="2.1.2" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.8" />
+	  <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.HttpsPolicy" Version="2.2.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.4" />
   </ItemGroup>
 
 </Project>
