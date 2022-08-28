@@ -5,6 +5,7 @@ using Memo.App.WebFramework.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Memo.App.WebFramework.Filter;
+using Memo.App.Api.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -37,19 +38,9 @@ namespace Memo.App.Api.Controller
             return user;
         }
 
-        public class UserViewModel
-        {
-            public string UserName { get; set; }
-            public string Password { get; set; }
-
-            public string Name { get; set; }
-            public string Family { get; set; }
-            public int Age { get; set; }
-            public bool IsActive { get; set; }
-        }
         // POST api/<UserController>
         [HttpPost]
-        public async Task<ApiResult<UserViewModel>> Post(UserViewModel model, CancellationToken cancellationToken)
+        public async Task<ApiResult<UserDto>> Post(UserDto model, CancellationToken cancellationToken)
         {
             var user = new User();
             user.Name = model.Name;
@@ -65,7 +56,7 @@ namespace Memo.App.Api.Controller
 
         // PUT api/<UserController>/5
         [HttpPut("{id:int}")]
-        public async Task<ApiResult> Put(int id, UserViewModel user, CancellationToken cancellationToken)
+        public async Task<ApiResult> Put(int id, UserDto user, CancellationToken cancellationToken)
         {
             var updateUser = await userRepository.GetByIdAsync(cancellationToken, id);
             updateUser.Name = user.Name;

@@ -30,12 +30,13 @@ namespace Memo.App.WebFramework.Filter
             }
             else if(context.Result is BadRequestObjectResult badRequestObjectResult)
             {
-                var message = badRequestObjectResult.Value.ToString();
-                if(badRequestObjectResult.Value is SerializableError errors)
-                {
-                    var errorsMessage = errors.SelectMany(p => (string[])p.Value).Distinct();
-                    message = string.Join(" | ", errorsMessage);
-                }
+                var pi = badRequestObjectResult.Value.GetType().GetProperty("Errors");
+                var errors = (Dictionary<string, string[]>)(pi.GetValue(badRequestObjectResult.Value, null));
+
+                var message = badRequestObjectResult.ToString();
+                var errorMessage = errors.SelectMany(p => p.Value).Distinct();
+                message = string.Join(" | ", errorMessage);
+
                 var apiResult = new ApiResult(false, StatusCode.BadRequest, message);
                 context.Result = new JsonResult(apiResult) { StatusCode = badRequestObjectResult.StatusCode };
             }
