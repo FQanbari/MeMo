@@ -31,12 +31,12 @@ namespace Memo.App.WebFramework.Api
         }
         public static implicit operator ApiResult(BadRequestObjectResult result)
         {
-            var message = result.Value.ToString();
-            if(result.Value is SerializableError errors)
-            {
-                var errorMessages = errors.SelectMany(p => (string[])p.Value).Distinct();
-                message = string.Join("|", errorMessages);
-            }
+            var pi = result.Value.GetType().GetProperty("Errors");
+            var errors = (Dictionary<string, string[]>)(pi.GetValue(result.Value, null));
+
+            var message = result.ToString();
+            var errorMessage = errors.SelectMany(p => p.Value).Distinct();
+            message = string.Join(" | ", errorMessage);
             return new ApiResult(false, StatusCode.BadRequest, message);
         }
         public static implicit operator ApiResult(ContentResult result)
@@ -79,12 +79,12 @@ namespace Memo.App.WebFramework.Api
         }
         public static implicit operator ApiResult<TData>(BadRequestObjectResult result)
         {
-            var message = result.Value.ToString();
-            if (result.Value is SerializableError errors)
-            {
-                var errorMessages = errors.SelectMany(p => (string[])p.Value).Distinct();
-                message = string.Join("|", errorMessages);
-            }
+            var pi = result.Value.GetType().GetProperty("Errors");
+            var errors = (Dictionary<string, string[]>)(pi.GetValue(result.Value, null));
+
+            var message = result.ToString();
+            var errorMessage = errors.SelectMany(p => p.Value).Distinct();
+            message = string.Join(" | ", errorMessage);
             return new ApiResult<TData>(false, StatusCode.BadRequest,null, message);
         }
         public static implicit operator ApiResult<TData>(ContentResult result)
