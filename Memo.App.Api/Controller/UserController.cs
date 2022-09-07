@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Memo.App.WebFramework.Filter;
 using Memo.App.Api.Models;
+using Memo.App.Common.Exceptions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -42,6 +43,9 @@ namespace Memo.App.Api.Controller
         [HttpPost]
         public async Task<ApiResult<UserDto>> Post(UserDto model, CancellationToken cancellationToken)
         {
+            var exisit = userRepository.TableNoTracking.Any(p => p.UserName == model.UserName);
+            if (exisit)
+                throw new BadRequestException("کاربر وجود دارد.");
             var user = new User();
             user.Name = model.Name;
             user.UserName = model.UserName;
@@ -50,6 +54,7 @@ namespace Memo.App.Api.Controller
             user.Age = model.Age;
 
             await userRepository.AddAsync(user, cancellationToken);
+            var list = new List<string>();
 
             return Ok(model);
         }
