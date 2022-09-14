@@ -1,4 +1,6 @@
 using Data.Repositories;
+using ElmahCore.Mvc;
+using ElmahCore.Sql;
 using Memo.App.Data;
 using Memo.App.Data.IRepository;
 using Memo.App.Data.Repository;
@@ -19,7 +21,11 @@ builder.Services.AddRazorPages();
 builder.Services.AddMvc();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository,UserRepository>();
-
+builder.Services.AddElmah<SqlErrorLog>(options =>
+{
+options.Path = builder.Configuration.GetSection("Elmah-Options")["Path"];
+options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
+});
 var app = builder.Build();
 
 app.UseCustomExceptionHandler();
@@ -37,7 +43,7 @@ app.UseCustomExceptionHandler();
 //    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 //    app.UseHsts();
 //}
-
+app.UseElmah();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
