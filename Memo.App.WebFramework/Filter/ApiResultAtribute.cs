@@ -1,4 +1,5 @@
-﻿using Memo.App.WebFramework.Api;
+﻿using Memo.App.Common.Api;
+using Memo.App.WebFramework.Api;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;

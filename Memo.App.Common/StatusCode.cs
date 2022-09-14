@@ -1,4 +1,4 @@
-﻿namespace Memo.App.WebFramework.Api
+﻿namespace Memo.App.Common.Api
 {
     public enum StatusCode
     {
@@ -7,5 +7,8 @@
         Exception = -1,
         DataNotFound = -2,
         BadRequest = -4,
+        LogicError = 5,
+        ServerError = 6,
+        UnAuthorized = 7
     }
 }
