@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Memo.App.WebFramework.Filter;
 using Memo.App.Api.Models;
 using Memo.App.Common.Exceptions;
+using Memo.App.Services.Idenitity;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,13 +20,17 @@ namespace Memo.App.Api.Controller
     public class UserController : ControllerBase
     {
         private readonly IUserRepository userRepository;
+        private readonly IJwtService jwtService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IJwtService jwtService)
         {
             this.userRepository = userRepository;
+            this.jwtService = jwtService;
+            //this.jwtService = jwtService;
         }
         // GET: api/<UserController>
         [HttpGet]
+        [Authorize(Roles = "geust")]
         public async Task<ApiResult<List<User>>> Get(CancellationToken cancellationToken)
         {
             var users = await userRepository.TableNoTracking.ToListAsync(cancellationToken);
@@ -38,14 +44,28 @@ namespace Memo.App.Api.Controller
             var user = await userRepository.GetByIdAsync(cancellationToken, id);
             return user;
         }
+        [HttpGet("[action]")]
+        [AllowAnonymous]
+        public async Task<string> Token(string username,CancellationToken cancellationToken)
+        {
+            var user = await userRepository.FindUserByUserName(username, cancellationToken);
+            if (user == null)
+                throw new BadRequestException("این کاربر وجود ندارد");
 
+            var exist = await userRepository.CheckUserNameAndPassword(user.UserName, user.Password, cancellationToken);
+            if (!exist)
+                throw new BadRequestException("رمز وارد شده اشتباه است");
+
+            var jwt = jwtService.Generate(user);
+            return jwt;
+        }
         // POST api/<UserController>
         [HttpPost]
         public async Task<ApiResult<UserDto>> Post(UserDto model, CancellationToken cancellationToken)
         {
             var exisit = userRepository.TableNoTracking.Any(p => p.UserName == model.UserName);
             if (exisit)
-                throw new BadRequestException("کاربر وجود دارد.");
+                throw new BadRequestException("کاربر وجود ندارد.");
             var user = new User();
             user.Name = model.Name;
             user.UserName = model.UserName;

@@ -10,5 +10,7 @@ namespace Memo.App.Data.IRepository
 {
     public interface IUserRepository : IRepository<User>
     {
+        public Task<User> FindUserByUserName(string userName, CancellationToken cancellationToken);
+        public Task<bool> CheckUserNameAndPassword(string userName,string password, CancellationToken cancellationToken);
     }
 }
