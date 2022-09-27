@@ -22,13 +22,15 @@ namespace Memo.App.WebFramework.Configuration
             }).AddJwtBearer(options =>
             {
                 var secretKey = Encoding.UTF8.GetBytes(jwtSettings.SecretKey);
+                var encryptKey = Encoding.UTF8.GetBytes(jwtSettings.EncryptKey);
+
                 var validationParameters = new TokenValidationParameters
                 {
                     ClockSkew = TimeSpan.Zero,
                     RequireSignedTokens = true,
 
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(secretKey)  ,
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKey),
 
                     RequireExpirationTime = true,
                     ValidateLifetime = true,
@@ -39,7 +41,7 @@ namespace Memo.App.WebFramework.Configuration
                     ValidateIssuer = true,
                     ValidIssuer = jwtSettings.Issuer,
 
-                    //TokenDecryptionKey = new SymmetricSecurityKey(encryptionKey);
+                    TokenDecryptionKey = new SymmetricSecurityKey(encryptKey)
                 };
 
                 options.RequireHttpsMetadata = false;

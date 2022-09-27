@@ -43,7 +43,7 @@ try
     {
         options.Path = _siteSettings.ElmahPath;
         options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
-        options.OnPermissionCheck = httpContext => httpContext.User.IsInRole("guest");
+        //options.OnPermissionCheck = httpContext => httpContext.User.IsInRole("guest");
     });
     //builder.Services.AddControllers(options =>
     //{
