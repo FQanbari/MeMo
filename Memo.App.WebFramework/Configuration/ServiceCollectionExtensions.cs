@@ -1,10 +1,18 @@
-﻿using Memo.App.Common;
+﻿using Common;
+using Memo.App.Common;
+using Memo.App.Common.Api;
+using Memo.App.Common.Exceptions;
+using Memo.App.Data.IRepository;
+using Memo.App.Data.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,7 +54,43 @@ namespace Memo.App.WebFramework.Configuration
 
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
-                options.TokenValidationParameters = validationParameters; 
+                options.TokenValidationParameters = validationParameters;
+                options.Events = new JwtBearerEvents 
+                { 
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception != null)
+                            throw new AppException(StatusCode.UnAuthorized, "Authorize Faild", HttpStatusCode.Unauthorized, context.Exception, null);
+
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = async context =>
+                    {
+                        var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
+                        var claimIdentity = context.Principal.Identity as ClaimsIdentity;
+                        if (claimIdentity.Claims?.Any() != true)
+                            context.Fail("This token has no claim");
+
+                        var securityStamp = claimIdentity.FindFirstValue(new ClaimsIdentityOptions().SecurityStampClaimType);
+                        var userId = claimIdentity.GetUserId<int>();
+                        var user = await userRepository.GetByIdAsync(context.HttpContext.RequestAborted, userId);
+
+                        if (user.SecurityStamp != Guid.Parse(securityStamp))
+                            context.Fail("Stamp Security token not valid.");
+
+                        if (!user.IsActive)
+                            context.Fail("User not Active.");
+
+                        userRepository.UpdateLastLoginDateAsync(user, context.HttpContext.RequestAborted);
+                    },
+                    OnChallenge = context =>
+                    {
+                        if (context.AuthenticateFailure != null)
+                            throw new AppException(StatusCode.UnAuthorized, context.AuthenticateFailure.Message, HttpStatusCode.Unauthorized, context.AuthenticateFailure);
+
+                        throw new AppException(StatusCode.UnAuthorized,"you are unauthorized in this resource.",HttpStatusCode.Unauthorized);
+                    }
+                };
             });
         }
     }

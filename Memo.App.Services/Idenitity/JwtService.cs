@@ -1,5 +1,6 @@
 ﻿using Memo.App.Common;
 using Memo.App.Entities.Account;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -50,10 +51,12 @@ namespace Memo.App.Services.Idenitity
 
         private IEnumerable<Claim> _getClaims(User user)
         {
+            var securityStampClaimType = new ClaimsIdentityOptions().SecurityStampClaimType;
             var list = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(securityStampClaimType, user.SecurityStamp.ToString())
             };
 
             var roles = new Role[] { new Role { Name = "geust" } };

@@ -16,6 +16,7 @@ namespace Memo.App.Entities.Account
             IsActive = true;
             IsDelete = false;
             InsertDate = DateTime.Now;
+            SecurityStamp = Guid.NewGuid();
         }
         public string Name { get; set; }
         public string Family { get; set; }
@@ -24,7 +25,9 @@ namespace Memo.App.Entities.Account
         public int Age { get; set; }
         public bool IsActive { get; set; }
         public bool IsDelete { get; set; }
+        public Guid SecurityStamp { get; set; }
         public DateTime InsertDate { get; set; }
+        public DateTime LastLoginDate { get; set; }
 
         public ICollection<Memo.App.Entities.Task.Task> Tasks { get; set; }
     }

@@ -10,7 +10,10 @@ namespace Memo.App.Data.IRepository
 {
     public interface IUserRepository : IRepository<User>
     {
-        public Task<User> FindUserByUserName(string userName, CancellationToken cancellationToken);
-        public Task<bool> CheckUserNameAndPassword(string userName,string password, CancellationToken cancellationToken);
+        public Task<User> FindUserByUserNameAsync(string userName, CancellationToken cancellationToken);
+        public Task<bool> CheckUserNameAndPasswordAsync(string userName,string password, CancellationToken cancellationToken);
+        Task UpdateLastLoginDateAsync(User user, CancellationToken cancellationToken);
+        Task UpdateSecurityStapAsync(User user, CancellationToken cancellationToken);
+        void UpdateSecurityStap(User user, bool saveNow = true);
     }
 }

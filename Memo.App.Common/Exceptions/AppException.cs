@@ -74,6 +74,9 @@ namespace Memo.App.Common.Exceptions
         public AppException(StatusCode statusCode,string message,HttpStatusCode httpStatusCode,Exception exception,object additionalData)
             :base(message,exception)
         {
+            StatusCode = statusCode;
+            HttpStatusCode = httpStatusCode;
+            AdditionalData = additionalData;
         }             
     }
 }

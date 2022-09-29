@@ -18,7 +18,7 @@ namespace Memo.App.WebFramework.Api
         public ApiResult(bool isSuccess, StatusCode statusCode, string message = null)
         {
             IsSuccess = isSuccess;
-            statusCode = statusCode;
+            StatusCode = statusCode;
             Message = message ?? statusCode.ToString();
         }
         #region Implicit Operator

@@ -48,11 +48,11 @@ namespace Memo.App.Api.Controller
         [AllowAnonymous]
         public async Task<string> Token(string username,CancellationToken cancellationToken)
         {
-            var user = await userRepository.FindUserByUserName(username, cancellationToken);
+            var user = await userRepository.FindUserByUserNameAsync(username, cancellationToken);
             if (user == null)
                 throw new BadRequestException("این کاربر وجود ندارد");
 
-            var exist = await userRepository.CheckUserNameAndPassword(user.UserName, user.Password, cancellationToken);
+            var exist = await userRepository.CheckUserNameAndPasswordAsync(user.UserName, user.Password, cancellationToken);
             if (!exist)
                 throw new BadRequestException("رمز وارد شده اشتباه است");
 
@@ -81,6 +81,7 @@ namespace Memo.App.Api.Controller
 
         // PUT api/<UserController>/5
         [HttpPut("{id:int}")]
+        [AllowAnonymous]
         public async Task<ApiResult> Put(int id, UserDto user, CancellationToken cancellationToken)
         {
             var updateUser = await userRepository.GetByIdAsync(cancellationToken, id);
