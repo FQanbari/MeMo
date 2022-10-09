@@ -1,4 +1,5 @@
 ﻿using Data.Repositories;
+using Memo.App.Common;
 using Memo.App.Common.Exceptions;
 using Memo.App.Data.IRepository;
 using Memo.App.Entities.Account;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Memo.App.Data.Repository
 {
-    public class UserRepository : Repository<User>, IUserRepository
+    public class UserRepository : Repository<User>,IScopedDependency, IUserRepository
     {
         private readonly UserManager<User> userManager;
 

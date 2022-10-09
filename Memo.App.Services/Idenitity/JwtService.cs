@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Memo.App.Services.Idenitity
 {
-    public class JwtService : IJwtService
+    public class JwtService : IScopedDependency, IJwtService
     {
         private readonly SiteSettings _siteSettings;
         private readonly SignInManager<User> signInManager;

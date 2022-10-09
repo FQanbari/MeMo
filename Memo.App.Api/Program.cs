@@ -24,28 +24,20 @@ try
 
     var _siteSettings = builder.Configuration.GetSection(nameof(SiteSettings)).Get<SiteSettings>();
     builder.Services.Configure<SiteSettings>(builder.Configuration.GetSection(nameof(SiteSettings)));
+
     //Add ConnectionString
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"));
-    });
+    builder.Services.AddDbContext(builder.Configuration);
 
     // Add services to the container.
     builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
+
     builder.Services.AddRazorPages();
-    builder.Services.AddMvc(options =>
-    {
-        options.Filters.Add(new AuthorizeFilter());
-    });
-    builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-    builder.Services.AddScoped<IUserRepository, UserRepository>();
-    builder.Services.AddScoped<IJwtService, JwtService>();
-    builder.Services.AddElmah<SqlErrorLog>(options =>
-    {
-        options.Path = _siteSettings.ElmahPath;
-        options.ConnectionString = builder.Configuration.GetConnectionString("Elmah");
-        //options.OnPermissionCheck = httpContext => httpContext.User.IsInRole("guest");
-    });
+
+    builder.Services.AddMinimalMvc();
+    
+    builder.Host.AddAutofacConfiguration();
+
+    builder.Services.AddElmahCore(builder.Configuration,_siteSettings);
     //builder.Services.AddControllers(options =>
     //{
     //    options.Filters.Add(new AuthorizeFilter());

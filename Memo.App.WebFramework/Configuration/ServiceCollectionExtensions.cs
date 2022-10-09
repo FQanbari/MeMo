@@ -1,12 +1,18 @@
 ﻿using Common;
+using ElmahCore.Mvc;
+using ElmahCore.Sql;
 using Memo.App.Common;
 using Memo.App.Common.Api;
 using Memo.App.Common.Exceptions;
+using Memo.App.Data;
 using Memo.App.Data.IRepository;
 using Memo.App.Data.Repository;
 using Memo.App.Entities.Account;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -15,12 +21,44 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace Memo.App.WebFramework.Configuration
 {
     public static class ServiceCollectionExtensions
     {        
+        public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("SqlServer"));
+            });
+
+        }
+        public static void AddMinimalMvc(this IServiceCollection services)
+        {
+            services.AddMvcCore(options =>
+            {
+                options.Filters.Add(new AuthorizeFilter());
+            })
+             .AddApiExplorer()
+             .AddAuthorization()
+             .AddFormatterMappings()
+             .AddDataAnnotations()
+             .AddJsonOptions(o => o.JsonSerializerOptions.Encoder = JavaScriptEncoder.Default)
+             .AddCors();
+        }
+
+        public static void AddElmahCore(this IServiceCollection services, IConfiguration configuration, SiteSettings siteSetting)
+        {
+            services.AddElmah<SqlErrorLog>(options =>
+            {
+                options.Path = siteSetting.ElmahPath;
+                options.ConnectionString = configuration.GetConnectionString("Elmah");
+                //options.OnPermissionCheck = httpContext => httpContext.User.IsInRole("guest");
+            });
+        }
         public static void AddJwtAuthentication(this IServiceCollection services,JwtSettings jwtSettings)
         {
             services.AddAuthentication(options => 
