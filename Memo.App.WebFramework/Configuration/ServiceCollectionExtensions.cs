@@ -4,6 +4,7 @@ using Memo.App.Common.Api;
 using Memo.App.Common.Exceptions;
 using Memo.App.Data.IRepository;
 using Memo.App.Data.Repository;
+using Memo.App.Entities.Account;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,6 +67,7 @@ namespace Memo.App.WebFramework.Configuration
                     },
                     OnTokenValidated = async context =>
                     {
+                        var signInManager = context.HttpContext.RequestServices.GetRequiredService<SignInManager<User>>();
                         var userRepository = context.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
                         var claimIdentity = context.Principal.Identity as ClaimsIdentity;
                         if (claimIdentity.Claims?.Any() != true)
@@ -75,13 +77,17 @@ namespace Memo.App.WebFramework.Configuration
                         var userId = claimIdentity.GetUserId<int>();
                         var user = await userRepository.GetByIdAsync(context.HttpContext.RequestAborted, userId);
 
-                        if (user.SecurityStamp != Guid.Parse(securityStamp))
-                            context.Fail("Stamp Security token not valid.");
+                        //if (user.SecurityStamp != Guid.Parse(securityStamp))
+                        //    context.Fail("Stamp Security token not valid.");
+
+                        var validatedUser = await signInManager.ValidateSecurityStampAsync(context.Principal);
+                        if (validatedUser == null)
+                            context.Fail("Token security stamp is no valid.");
 
                         if (!user.IsActive)
                             context.Fail("User not Active.");
 
-                        userRepository.UpdateLastLoginDateAsync(user, context.HttpContext.RequestAborted);
+                        await userRepository.UpdateLastLoginDateAsync(user, context.HttpContext.RequestAborted);
                     },
                     OnChallenge = context =>
                     {

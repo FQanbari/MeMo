@@ -16,12 +16,14 @@ namespace Memo.App.Services.Idenitity
     public class JwtService : IJwtService
     {
         private readonly SiteSettings _siteSettings;
+        private readonly SignInManager<User> signInManager;
 
-        public JwtService(IOptionsSnapshot<SiteSettings> settings)
+        public JwtService(IOptionsSnapshot<SiteSettings> settings, SignInManager<User> signInManager)
         {
             _siteSettings = settings.Value;
+            this.signInManager = signInManager;
         }
-        public string Generate(User user)
+        public async Task<string> GenerateAsync(User user)
         {
             var securityKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.SecretKey);
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256Signature);
@@ -29,7 +31,7 @@ namespace Memo.App.Services.Idenitity
             var encryptionKey = Encoding.UTF8.GetBytes(_siteSettings.JwtSettings.EncryptKey);
             var ecryptionCredentials = new EncryptingCredentials(new SymmetricSecurityKey(encryptionKey), SecurityAlgorithms.Aes128KW, SecurityAlgorithms.Aes128CbcHmacSha256);
 
-            var claims = _getClaims(user);
+            var claims = await _getClaimsAsync(user);
             var descriptor = new SecurityTokenDescriptor
             {
                 Issuer = _siteSettings.JwtSettings.Issuer,
@@ -49,22 +51,25 @@ namespace Memo.App.Services.Idenitity
             return jwt;
         }
 
-        private IEnumerable<Claim> _getClaims(User user)
+        private async Task<IEnumerable<Claim>> _getClaimsAsync(User user)
         {
-            var securityStampClaimType = new ClaimsIdentityOptions().SecurityStampClaimType;
-            var list = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(securityStampClaimType, user.SecurityStamp.ToString())
-            };
+            var claimsPrincipal = await signInManager.ClaimsFactory.CreateAsync(user);
 
-            var roles = new Role[] { new Role { Name = "geust" } };
+            return claimsPrincipal.Claims;
+            //var securityStampClaimType = new ClaimsIdentityOptions().SecurityStampClaimType;
+            //var list = new List<Claim>
+            //{
+            //    new Claim(ClaimTypes.Name, user.Name),
+            //    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            //    new Claim(securityStampClaimType, user.SecurityStamp.ToString())
+            //};
 
-            foreach (var role in roles)
-                list.Add(new Claim(ClaimTypes.Role, role.Name));
+            //var roles = new Role[] { new Role { Name = "geust" } };
 
-            return list;
+            //foreach (var role in roles)
+            //    list.Add(new Claim(ClaimTypes.Role, role.Name));
+
+            //return list;
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Memo.App.Api.Models
         public string Name { get; set; }
         public string Family { get; set; }
         public int Age { get; set; }
+        public string Email { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

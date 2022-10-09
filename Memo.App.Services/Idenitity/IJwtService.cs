@@ -4,6 +4,6 @@ namespace Memo.App.Services.Idenitity
 {
     public interface IJwtService
     {
-        string Generate(User user);
+        Task<string> GenerateAsync(User user);
     }
 }

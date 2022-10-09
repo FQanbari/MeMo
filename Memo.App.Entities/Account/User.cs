@@ -1,4 +1,5 @@
 ﻿using Memo.App.Entities.BaseEntity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -9,23 +10,20 @@ using System.Threading.Tasks;
 
 namespace Memo.App.Entities.Account
 {
-    public class User: Entity
+    public class User: IdentityUser<int>,IEntity
     {
         public User()
         {
             IsActive = true;
             IsDelete = false;
             InsertDate = DateTime.Now;
-            SecurityStamp = Guid.NewGuid();
         }
         public string Name { get; set; }
         public string Family { get; set; }
-        public string UserName { get; set; }
         public string Password { get; set; }
         public int Age { get; set; }
         public bool IsActive { get; set; }
         public bool IsDelete { get; set; }
-        public Guid SecurityStamp { get; set; }
         public DateTime InsertDate { get; set; }
         public DateTime LastLoginDate { get; set; }
 

@@ -35,7 +35,7 @@ namespace Memo.App.WebFramework.Middleware
             _env = env;
             _logger = logger;
         }
-        public async Task Invoke(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             string message = null;
             HttpStatusCode httpStatusCode = HttpStatusCode.InternalServerError;

@@ -31,6 +31,7 @@ try
     });
 
     // Add services to the container.
+    builder.Services.AddCustomIdentity(_siteSettings.IdentitySettings);
     builder.Services.AddRazorPages();
     builder.Services.AddMvc(options =>
     {
